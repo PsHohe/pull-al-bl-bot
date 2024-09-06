@@ -4,3 +4,5 @@
 .env
 
 /src/userData.json
+
+.DS_Store

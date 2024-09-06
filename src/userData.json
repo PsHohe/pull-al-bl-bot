@@ -2,6 +2,16 @@
   "373572992220921879": {
     "name": "Hohenax",
     "class": "evoker",
-    "role": "support"
+    "role": "healer"
+  },
+  "389760285944053760": {
+    "name": "Praymuz",
+    "class": "paladin",
+    "role": "healer"
+  },
+  "266332222796201998": {
+    "name": "Synaptics",
+    "class": "mage",
+    "role": "dps"
   }
 }

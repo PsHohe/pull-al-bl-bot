@@ -5,10 +5,10 @@ const { USER_DATA_FILE } = require("../config");
 const filePath = path.join(__dirname, "..", USER_DATA_FILE);
 
 exports.loadUserData = () => {
-  if (fs.existsSync(filePath)) {
-    return JSON.parse(fs.readFileSync(filePath, "utf8"));
+  if (!fs.existsSync(filePath)) {
+    fs.writeFileSync(filePath, JSON.stringify({}));
   }
-  return {};
+  return JSON.parse(fs.readFileSync(filePath, "utf8"));
 };
 
 exports.saveUserData = (userData) => {

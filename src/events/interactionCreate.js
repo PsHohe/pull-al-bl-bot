@@ -69,7 +69,6 @@ module.exports = {
       switch (interaction.customId) {
         case "join":
           if (!userData[userId]) {
-            // User hasn't defined their character
             await interaction.reply({
               content:
                 "Antes de unirte a la raid, debes definir tu personaje. Usa el comando `/definir-personaje` para hacerlo.",
@@ -85,27 +84,22 @@ module.exports = {
 
           let replyContent;
           if (userIndex !== -1) {
-            // User is already in the list, so remove them
             participants.splice(userIndex, 1);
             replyContent = "Has sido removido de la lista de participantes.";
           } else {
-            // User is not in the list, so add them
             participants.push(userEntry);
             absents = absents.filter((user) => !user.includes(userMention));
             replyContent = "Has sido añadido a la lista de participantes.";
           }
 
-          // First, update the embed
           await updateEmbed(interaction, embed, participants, absents);
 
-          // Then, send the reply to the user
           await interaction.followUp({
             content: replyContent,
             ephemeral: true,
           });
           break;
         case "leave":
-          // Create and show modal for absence reason
           const modal = new ModalBuilder()
             .setCustomId("absence-reason-modal")
             .setTitle("Razón de ausencia");
@@ -139,7 +133,6 @@ module.exports = {
           ? `${classEmojis[userData[userId].class]}${roleEmojis[userData[userId].role]}`
           : "";
 
-        // Update the raid message
         const message = interaction.message;
         const embed = message.embeds[0];
         const fields = embed.fields;
@@ -165,7 +158,6 @@ module.exports = {
 
         await updateEmbed(interaction, embed, participants, absents);
 
-        // Send message to officers channel
         const officersChannel = interaction.guild.channels.cache.find(
           (ch) => ch.name === CHANNEL_NAME,
         );
@@ -274,13 +266,11 @@ async function lockRaid(interaction, embed) {
 }
 
 async function exportRaidToCSV(interaction, embed, userData) {
-  // Extract raid information
   const raidName = embed.title.split("**")[1];
   const [date, time] = embed.description
     .split("\n")
     .map((line) => line.split("`")[1]);
 
-  // Extract participants and absents
   const participants = embed.fields[0].value
     .split("\n")
     .filter((p) => p !== "_Nadie se ha unido aún_");
@@ -288,10 +278,8 @@ async function exportRaidToCSV(interaction, embed, userData) {
     .split("\n")
     .filter((p) => p !== "_Nadie ha confirmado ausencia_");
 
-  // Create CSV content
   let csvContent = "Nombre,Clase,Rol,Estado\n";
 
-  // Function to process user data
   const processUser = (userMention, status) => {
     const [mention, nameAndEmojis] = userMention.split(" (");
     const [characterName, classRoleEmojis] = nameAndEmojis.split(") ");
@@ -313,17 +301,14 @@ async function exportRaidToCSV(interaction, embed, userData) {
     }
   };
 
-  // Process participants
   participants.forEach((participant) => {
     csvContent += processUser(participant, "Presente");
   });
 
-  // Process absents
   absents.forEach((absent) => {
     csvContent += processUser(absent, "Ausente");
   });
 
-  // Create and send the CSV file
   const buffer = Buffer.from(csvContent, "utf-8");
   await interaction.reply({
     content: `Exportación de la raid "${raidName}" (${date} ${time})`,
